@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+set -e
+
+# shellcheck source=../cont-mongo.d/functions
+source /etc/cont-mongo.d/functions
+
+if [ ! -f "${MONGO_CONFIG}" ]; then
+  log-init "loading default configuration"
+  s6-setuidgid abc cp -r /defaults/mongo/mongod.conf "${MONGO_CONFIG}"
+fi

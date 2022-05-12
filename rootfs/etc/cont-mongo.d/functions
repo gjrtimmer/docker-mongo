@@ -1,0 +1,81 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash disable=SC1008
+set -e
+
+## Logging
+# $1 message
+log-init() {
+	s6-echo -- "[cont-init.d] ${0##*/}: $1"
+}
+
+# shellcheck source=env-defaults
+source /etc/cont-mongo.d/env-defaults
+
+is_service_running() {
+	local SERVICE="${1}"
+
+	SERVICE_UP=$(s6-svstat -u "/run/s6/services/${SERVICE}")
+	if [[ "${SERVICE_UP}" == true ]]; then
+		return 0
+	fi
+
+	return 1
+}
+
+## Set container timezone
+# $1 Timezone
+container_set_timezone() {
+	cp "/usr/share/zoneinfo/${TZ}" /etc/localtime
+	log-init "Timezone set to ${TZ}"
+}
+
+cron_configure_dirs() {
+	if [ ! -d "${CRON_DATA_DIR}" ]; then
+		mkdir -p "${CRON_DATA_DIR}"
+	fi
+
+	if [ ! -d "${CRON_LOG_DIR}" ]; then
+		mkdir -p "${CRON_LOG_DIR}"
+	fi
+
+	chown -R abc:abc "${CRON_DATA_DIR}"
+	chown -R abc:abc "${CRON_LOG_DIR}"
+}
+
+cron_configure_tabs() {
+	if [[ ! -f "${CRON_DATA_DIR}"/root ]] && crontab -l -u root; then
+		crontab -l -u root > "${CRON_DATA_DIR}/root"
+	fi
+
+	if [[ ! -f "${CRON_DATA_DIR}"/root ]]; then
+		cp /defaults/crontabs/root "${CRON_DATA_DIR}/root"
+	fi
+
+	if [[ ! -f "${CRON_DATA_DIR}"/abc ]] && crontab -l -u abc; then
+		crontab -l -u abc > "${CRON_DATA_DIR}/abc"
+	fi
+
+	if [[ ! -f "${CRON_DATA_DIR}"/abc ]]; then
+		cp /defaults/crontabs/abc "${CRON_DATA_DIR}/abc"
+	fi
+}
+
+mongo_configure_dirs() {
+	if [ ! -d "${MONGO_HOME}" ]; then
+		mkdir -p "${MONGO_HOME}"
+	fi
+
+	if [ ! -d "${MONGO_DB_DIR}" ]; then
+		mkdir -p "${MONGO_DB_DIR}"
+	fi
+
+	if [ ! -d "${MONGO_CFGDB_DIR}" ]; then
+		mkdir -p "${MONGO_CFGDB_DIR}"
+	fi
+
+	if [ ! -d "${MONGO_ARCHIVE_DIR}" ]; then
+		mkdir -p "${MONGO_ARCHIVE_DIR}"
+	fi
+}
+
+# EOF

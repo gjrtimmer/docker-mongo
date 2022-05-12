@@ -1,0 +1,113 @@
+FROM ghcr.io/linuxserver/baseimage-ubuntu:focal AS os
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update; \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    jq \
+    bash \
+    numactl \
+    sudo \
+    procps \
+    htop \
+    iotop \
+    wget \
+    gnupg \
+    dirmngr \
+    tzdata \
+    cron; \
+    echo "abc ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/abc; \
+    chmod 600 /etc/sudoers.d/abc; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false;
+
+FROM os AS jsyaml
+
+ENV JSYAML_VERSION 3.13.1
+
+RUN mkdir -p /etc/cont-mongo.d/scripts/; \
+    wget -O /etc/cont-mongo.d/scripts/js-yaml.js "https://github.com/nodeca/js-yaml/raw/${JSYAML_VERSION}/dist/js-yaml.js"
+
+FROM jsyaml AS mongo
+
+RUN set -ex; \
+    export GNUPGHOME="$(mktemp -d)"; \
+    set -- '20691EEC35216C63CAF66CE1656408E390CFB1F5'; \
+    for key; do \
+    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
+    done; \
+    mkdir -p /etc/apt/keyrings; \
+    gpg --batch --export "$@" > /etc/apt/keyrings/mongodb.gpg; \
+    command -v gpgconf && gpgconf --kill all || :; \
+    rm -r "$GNUPGHOME"
+
+# Allow build-time overrides (eg. to build image with MongoDB Enterprise version)
+# Options for MONGO_PACKAGE: mongodb-org OR mongodb-enterprise
+# Options for MONGO_REPO: repo.mongodb.org OR repo.mongodb.com
+# Example: docker build --build-arg MONGO_PACKAGE=mongodb-enterprise --build-arg MONGO_REPO=repo.mongodb.com .
+ARG MONGO_PACKAGE=mongodb-org
+ARG MONGO_REPO=repo.mongodb.org
+ENV MONGO_PACKAGE=${MONGO_PACKAGE} MONGO_REPO=${MONGO_REPO}
+
+ENV MONGO_MAJOR 4.4
+RUN echo "deb [ signed-by=/etc/apt/keyrings/mongodb.gpg ] http://$MONGO_REPO/apt/ubuntu focal/${MONGO_PACKAGE%-unstable}/$MONGO_MAJOR multiverse" | tee "/etc/apt/sources.list.d/${MONGO_PACKAGE%-unstable}.list"
+
+# https://docs.mongodb.org/master/release-notes/4.4/
+ENV MONGO_VERSION 4.4.14
+# 05/04/2022, https://github.com/mongodb/mongo/tree/0b0843af97c3ec9d2c0995152d96d2aad725aab7
+
+RUN apt-get update; \
+    # starting with MongoDB 4.3 (and backported to 4.0 and 4.2 *and* 3.6??), the postinst for server includes an unconditional "systemctl daemon-reload" (and we don't have anything for "systemctl" to talk to leading to dbus errors and failed package installs)
+    ln -s /bin/true /usr/local/bin/systemctl; \
+    apt-get install -y \
+    ${MONGO_PACKAGE}=$MONGO_VERSION \
+    ${MONGO_PACKAGE}-server=$MONGO_VERSION \
+    ${MONGO_PACKAGE}-shell=$MONGO_VERSION \
+    ${MONGO_PACKAGE}-mongos=$MONGO_VERSION \
+    ${MONGO_PACKAGE}-tools=$MONGO_VERSION; \
+    rm -f /usr/local/bin/systemctl; \
+    rm -rf /var/lib/mongodb; \
+    mkdir -p /defaults/mongo/mongod.conf.orig; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
+
+# Install package holds on Mongo
+RUN apt-mark hold ${MONGO_PACKAGE}; \
+    apt-mark hold ${MONGO_PACKAGE}-server; \
+    apt-mark hold ${MONGO_PACKAGE}-shell; \
+    apt-mark hold ${MONGO_PACKAGE}-mongos; \
+    apt-mark hold ${MONGO_PACKAGE}-tools
+
+FROM mongo AS runtime
+
+ARG BUILD_DATE
+ARG CI_PROJECT_NAME
+ARG CI_PROJECT_URL
+ARG VCS_REF
+ARG DOCKER_IMAGE
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    HOME=/config \
+    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
+    S6_SYNC_DISKS=1
+
+EXPOSE 27017/tcp
+
+WORKDIR ${HOME}
+VOLUME [ "${HOME}", "${HOME}/mongo/archive", "${HOME}/mongo/db", "${HOME}/mongo/configdb" ]
+
+COPY rootfs/ /
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 CMD [ "healthcheck" ]
+
+LABEL \
+    maintainer="G.J.R. Timmer <gjr.timmer@gmail.com>" \
+    org.label-schema.schema-version="1.0" \
+    org.label-schema.build-date=${BUILD_DATE} \
+    org.label-schema.name=${CI_PROJECT_NAME} \
+    org.label-schema.url="${CI_PROJECT_URL}" \
+    org.label-schema.vcs-url="${CI_PROJECT_URL}.git" \
+    org.label-schema.vcs-ref=${VCS_REF} \
+    org.label-schema.docker.image="${DOCKER_IMAGE}" \
+    org.label-schema.license=MIT
+
+# EOF

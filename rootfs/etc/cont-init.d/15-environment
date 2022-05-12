@@ -1,0 +1,29 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+set -e
+
+# shellcheck source=../cont-mongo.d/functions
+source /etc/cont-mongo.d/functions
+
+# Load Environment Variables
+set -o allexport
+# shellcheck source=../cont-mongo.d/env-defaults
+. /etc/cont-mongo.d/env-defaults
+set +o allexport
+
+# Print Environment
+log-init "Environment Variables:"
+MASKED=("MONGO_ROOT_PASSWORD")
+env -0 | sort -z | while IFS='=' read -r -d '' k v; do
+  if [ -z "$v" ]; then
+    log-init "  $k=<not-set>"
+  else
+    if [[ " ${MASKED[*]} " =~ $k ]]; then
+      log-init "  $k=********"
+    else
+      log-init "  $k=$v"
+    fi
+  fi
+done
+
+# EOF

@@ -1,0 +1,29 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+set -e
+
+# shellcheck source=../cont-mongo.d/functions
+source /etc/cont-mongo.d/functions
+
+# Set container timezone
+container_set_timezone
+
+# Configure directories
+cron_configure_dirs
+cron_configure_tabs
+
+# Mongo Directories
+mongo_configure_dirs
+
+# Permissions
+log-init "setting permissions"
+if [ -f "/usr/bin/find" ] && [ -f "/usr/bin/xargs" ]; then
+    CORES=$(nproc --all)
+    find /config -type d -print0 | \
+      xargs --null -r --max-args=1 --max-procs=$((CORES*2*8)) \
+      chown -R abc:abc
+else
+  chown -R abc:abc "$(ls /config)"
+fi
+
+# EOF

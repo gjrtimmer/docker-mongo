@@ -1,0 +1,16 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash disable=SC2034
+
+# Global
+TZ=${TZ:-UTC}
+
+# Cron
+CRON_DATA_DIR=${CRON_DATA_DIR:-/config/cron}
+CRON_LOG_DIR=${CRON_LOG_DIR:-${CRON_DATA_DIR}/logs}
+
+# Mongo
+MONGO_HOME=${MONGO_HOME:-${HOME}/mongo}
+MONGO_DB_DIR=${MONGO_DB_DIR:-${MONGO_HOME}/db}
+MONGO_CFGDB_DIR=${MONGO_CFGDB_DIR:-${MONGO_HOME}/configdb}
+MONGO_ARCHIVE_DIR=${MONGO_ARCHIVE_DIR:-${MONGO_HOME}/archive}
+MONGO_CONFIG=${MONGO_CONFIG:-${MONGO_HOME}/mongod.conf}
