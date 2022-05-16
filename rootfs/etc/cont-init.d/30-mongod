@@ -18,30 +18,30 @@ case "${MONGO_SYSTEMLOG_VERBOSITY}" in
 esac
 
 # systemLog.path
-set_mongo_param "systemLog.path" "${MONGO_SYSTEMLOG_PATH}"
+set_mongo_param "systemLog.path" "${MONGO_SYSTEMLOG_PATH}" 1
 
 # systemLog.logAppend
 if is_enabled "${MONGO_SYSTEMLOG_LOGAPPEND}"; then
-  set_mongo_param "systemLog.logAppend" true
+  set_mongo_param "systemLog.logAppend" "true"
 else
-  set_mongo_param "systemLog.logAppend" false
+  set_mongo_param "systemLog.logAppend" "false"
 fi
 
 # systemLog.logRotate
 case "${MONGO_SYSTEMLOG_LOGROTATE}" in
-  rename|reopen)  set_mongo_param "systemLog.logRotate" "${MONGO_SYSTEMLOG_LOGROTATE}";;
+  rename|reopen)  set_mongo_param "systemLog.logRotate" "${MONGO_SYSTEMLOG_LOGROTATE}" 1;;
   *)              log-init "invalid value for systemLog.logRotate: ${MONGO_SYSTEMLOG_LOGROTATE}";;
 esac
 
 # systemLog.destination
 case "${MONGO_SYSTEMLOG_DESTINATION}" in
-  file|syslog)  set_mongo_param "systemLog.destination" "${MONGO_SYSTEMLOG_DESTINATION}";;
+  file|syslog)  set_mongo_param "systemLog.destination" "${MONGO_SYSTEMLOG_DESTINATION}" 1;;
   *)            log-init "invalid value for systemLog.destination: ${MONGO_SYSTEMLOG_DESTINATION}";;
 esac
 
 # systemLog.timeStampFormat
 case "${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}" in
-  iso8601-local|iso8601-utc)  set_mongo_param "systemLog.timeStampFormat" "${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}";;
+  iso8601-local|iso8601-utc)  set_mongo_param "systemLog.timeStampFormat" "${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}" 1;;
   *)                          log-init "invalid value for systemLog.timeStampFormat: ${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}";;
 esac
 
@@ -56,13 +56,13 @@ fi
 set_mongo_param "net.maxIncomingConnections" "${MONGO_MAX_INCOMING_CONNS}"
 
 # net.compression.compressors
-set_mongo_param "net.compression.compressors" "${MONGO_COMPRESSORS}"
+set_mongo_param "net.compression.compressors" "${MONGO_COMPRESSORS}" 1
 
 # net.unixDomainSocket.enabled
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
-  set_mongo_param "net.unixDomainSocket.enabled" true
+  set_mongo_param "net.unixDomainSocket.enabled" "true"
 else
-  set_mongo_param "net.unixDomainSocket.enabled" false
+  set_mongo_param "net.unixDomainSocket.enabled" "false"
 fi
 
 # net.unixDomainSocket.pathPrefix
@@ -70,20 +70,20 @@ if [ ! -d "${MONGO_SOCKET_DIR}" ]; then
   mkdir -p "${MONGO_SOCKET_DIR}"
 fi
 chown -R abc:abc "${MONGO_SOCKET_DIR}"
-set_mongo_param "net.unixDomainSocket.pathPrefix" "${MONGO_SOCKET_DIR}"
+set_mongo_param "net.unixDomainSocket.pathPrefix" "${MONGO_SOCKET_DIR}" 1
 
 # security.authorization
 if is_enabled "${MONGO_SECURITY_AUTHORIZATION}"; then
-  set_mongo_param "security.authorization" "enabled"
+  set_mongo_param "security.authorization" "enabled" 1
 else
-  set_mongo_param "security.authorization" "disabled"
+  set_mongo_param "security.authorization" "disabled" 1
 fi
 
 # storage.directoryPerDB
-if is_enabled "${MONGO_DIRECTORY_PER_DB}"; then
-  set_mongo_param "storage.directoryPerDB" true
+if is_enabled "${MONGO_STORAGE_DIRECTORY_PER_DB}"; then
+  set_mongo_param "storage.directoryPerDB" "true"
 else
-  set_mongo_param "storage.directoryPerDB" false
+  set_mongo_param "storage.directoryPerDB" "false"
 fi
 
 # EOF

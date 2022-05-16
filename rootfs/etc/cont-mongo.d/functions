@@ -46,9 +46,14 @@ is_enabled() {
 set_mongo_param() {
 	local PARAM="${1}"
 	local VALUE="${2}"
+	local ESCAPE="${3:-0}"
 
-	log-init "setting mongo param ${PARAM} = ${VALUE}"
-	yq -i ".${PARAM} = ${VALUE}" "${MONGO_CONFIG}"
+	log-init "setting param ${PARAM} = ${VALUE}"
+	if [ "${ESCAPE}" == 1 ]; then
+		yq -i ".${PARAM} = \"${VALUE}\"" "${MONGO_CONFIG}"
+	else
+		yq -i ".${PARAM} = ${VALUE}" "${MONGO_CONFIG}"
+	fi
 }
 
 ## Set container timezone
