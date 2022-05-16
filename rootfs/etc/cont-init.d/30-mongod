@@ -11,9 +11,11 @@ if [ ! -f "${MONGO_CONFIG}" ]; then
   s6-setuidgid abc cp -r /defaults/mongo/mongod.conf "${MONGO_CONFIG}"
 fi
 
-# TODO Check for only numeric values
 # systemLog.verbosity
-set_mongo_param "systemLog.verbosity" "${MONGO_SYSTEMLOG_VERBOSITY}"
+case "${MONGO_SYSTEMLOG_VERBOSITY}" in
+  0|1|2|3|4|5)  set_mongo_param "systemLog.verbosity" "${MONGO_SYSTEMLOG_VERBOSITY}";;
+  *)            log-init "invalid value for systemLog.verbosity: ${MONGO_SYSTEMLOG_VERBOSITY}" ;;
+esac
 
 # systemLog.path
 set_mongo_param "systemLog.path" "${MONGO_SYSTEMLOG_PATH}"
