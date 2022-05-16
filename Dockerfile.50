@@ -21,6 +21,7 @@ RUN apt-get update; \
     cron; \
     echo "abc ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/abc; \
     chmod 600 /etc/sudoers.d/abc; \
+    apt-get autoremove; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false;
 
 FROM os AS jsyaml
