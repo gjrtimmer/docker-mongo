@@ -22,9 +22,9 @@ set_mongo_param "systemLog.path" "${MONGO_SYSTEMLOG_PATH}" 1
 
 # systemLog.logAppend
 if is_enabled "${MONGO_SYSTEMLOG_LOGAPPEND}"; then
-  set_mongo_param "systemLog.logAppend" "true"
+  set_mongo_param "systemLog.logAppend" true
 else
-  set_mongo_param "systemLog.logAppend" "false"
+  set_mongo_param "systemLog.logAppend" false
 fi
 
 # systemLog.logRotate
@@ -60,9 +60,9 @@ set_mongo_param "net.compression.compressors" "${MONGO_COMPRESSORS}" 1
 
 # net.unixDomainSocket.enabled
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
-  set_mongo_param "net.unixDomainSocket.enabled" "true"
+  set_mongo_param "net.unixDomainSocket.enabled" true
 else
-  set_mongo_param "net.unixDomainSocket.enabled" "false"
+  set_mongo_param "net.unixDomainSocket.enabled" false
 fi
 
 # net.unixDomainSocket.pathPrefix
@@ -81,9 +81,9 @@ fi
 
 # storage.directoryPerDB
 if is_enabled "${MONGO_STORAGE_DIRECTORY_PER_DB}"; then
-  set_mongo_param "storage.directoryPerDB" "true"
+  set_mongo_param "storage.directoryPerDB" true
 else
-  set_mongo_param "storage.directoryPerDB" "false"
+  set_mongo_param "storage.directoryPerDB" false
 fi
 
 # EOF
