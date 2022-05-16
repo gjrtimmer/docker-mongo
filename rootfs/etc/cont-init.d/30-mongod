@@ -11,11 +11,11 @@ if [ ! -f "${MONGO_CONFIG}" ]; then
   s6-setuidgid abc cp -r /defaults/mongo/mongod.conf "${MONGO_CONFIG}"
 fi
 
-# systemLog
 # TODO Check for only numeric values
+# systemLog.verbosity
 set_mongo_param "systemLog.verbosity" "${MONGO_SYSTEMLOG_VERBOSITY}"
 
-# Set log path
+# systemLog.path
 set_mongo_param "systemLog.path" "${MONGO_SYSTEMLOG_PATH}"
 
 
@@ -32,7 +32,7 @@ fi
 chown -R abc:abc "${MONGO_SOCKET_DIR}"
 set_mongo_param "net.unixDomainSocket.pathPrefix" "${MONGO_SOCKET_DIR}"
 
-# directoryPerDB
+# storage.directoryPerDB
 if is_enabled "${MONGO_DIRECTORY_PER_DB}"; then
   set_mongo_param "storage.directoryPerDB" true
 else
