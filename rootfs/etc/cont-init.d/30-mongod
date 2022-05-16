@@ -10,6 +10,13 @@ if [ ! -f "${MONGO_CONFIG}" ]; then
   s6-setuidgid abc cp -r /defaults/mongo/mongod.conf "${MONGO_CONFIG}"
 fi
 
+# Unix Socket directory
+if [ ! -d "${MONGO_SOCKET_DIR}" ]; then
+  mkdir -p "${MONGO_SOCKET_DIR}"
+fi
+chown -R abc:abc "${MONGO_SOCKET_DIR}"
+set_mongo_param "net.unixDomainSocket.pathPrefix" "${MONGO_SOCKET_DIR}"
+
 # directoryPerDB
 if is_enabled "${MONGO_DIRECTORY_PER_DB}"; then
   set_mongo_param "storage.directoryPerDB" true
