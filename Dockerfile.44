@@ -30,7 +30,14 @@ ENV JSYAML_VERSION 3.13.1
 RUN mkdir -p /etc/cont-mongo.d/scripts/; \
     wget -O /etc/cont-mongo.d/scripts/js-yaml.js "https://github.com/nodeca/js-yaml/raw/${JSYAML_VERSION}/dist/js-yaml.js"
 
-FROM jsyaml AS mongo
+FROM jsyaml AS yq
+
+ENV YQ_VERSION v4.25.1
+
+RUN wget -qO /usr/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"; \
+    chmod +x /usr/bin/yq
+
+FROM yq AS mongo
 
 RUN set -ex; \
     export GNUPGHOME="$(mktemp -d)"; \
