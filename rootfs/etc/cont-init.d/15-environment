@@ -13,7 +13,7 @@ set +o allexport
 
 # Print Environment
 log-init "Environment Variables:"
-MASKED=("MONGO_ROOT_PASSWORD")
+MASKED=("MONGO_SECURITY_ROOT_PASSWORD")
 env -0 | sort -z | while IFS='=' read -r -d '' k v; do
   if [ -z "$v" ]; then
     log-init "  $k=<not-set>"

@@ -72,6 +72,13 @@ fi
 chown -R abc:abc "${MONGO_SOCKET_DIR}"
 set_mongo_param "net.unixDomainSocket.pathPrefix" "${MONGO_SOCKET_DIR}"
 
+# security.authorization
+if is_enabled "${MONGO_SECURITY_AUTHORIZATION}"; then
+  set_mongo_param "security.authorization" "enabled"
+else
+  set_mongo_param "security.authorization" "disabled"
+fi
+
 # storage.directoryPerDB
 if is_enabled "${MONGO_DIRECTORY_PER_DB}"; then
   set_mongo_param "storage.directoryPerDB" true
