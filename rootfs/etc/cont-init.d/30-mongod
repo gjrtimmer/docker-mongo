@@ -5,12 +5,21 @@ set -e
 # shellcheck source=../cont-mongo.d/functions
 source /etc/cont-mongo.d/functions
 
+# Place configuration if not present
 if [ ! -f "${MONGO_CONFIG}" ]; then
   log-init "loading default configuration"
   s6-setuidgid abc cp -r /defaults/mongo/mongod.conf "${MONGO_CONFIG}"
 fi
 
-# Unix socket configuration
+# systemLog
+# TODO Check for only numeric values
+set_mongo_param "systemLog.verbosity" "${MONGO_SYSTEMLOG_VERBOSITY}"
+
+# Set log path
+set_mongo_param "systemLog.path" "${MONGO_LOG_FILE}"
+
+
+# net.unixDomainSocket
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
   set_mongo_param "net.unixDomainSocket.enabled" true
 else
