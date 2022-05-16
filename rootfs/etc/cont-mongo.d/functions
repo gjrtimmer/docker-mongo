@@ -22,6 +22,12 @@ is_service_running() {
 	return 1
 }
 
+get_service_pid() {
+	local SERVICE="${1}"
+
+	s6-svstat -p "/run/s6/services/${SERVICE}"
+}
+
 ## Check if enabled
 # $1 parameter to Check
 #
