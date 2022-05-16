@@ -55,16 +55,17 @@ fi
 # net.maxIncomingConnections
 set_mongo_param "net.maxIncomingConnections" "${MONGO_MAX_INCOMING_CONNS}"
 
-# net.unixDomainSocket
+# net.compression.compressors
+set_mongo_param "net.compression.compressors" "${MONGO_COMPRESSORS}"
+
+# net.unixDomainSocket.enabled
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
   set_mongo_param "net.unixDomainSocket.enabled" true
 else
   set_mongo_param "net.unixDomainSocket.enabled" false
 fi
 
-# net.compression.compressors
-set_mongo_param "net.compression.compressors" "${MONGO_COMPRESSORS}"
-
+# net.unixDomainSocket.pathPrefix
 if [ ! -d "${MONGO_SOCKET_DIR}" ]; then
   mkdir -p "${MONGO_SOCKET_DIR}"
 fi
