@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+set -e
+
+# shellcheck source=../../cont-mongo.d/functions
+source /etc/cont-mongo.d/functions
+
+# Start Mongo Database
+exec exec s6-setuidgid abc mongod --config "${MONGO_CONFIG}"
+
+# EOF
