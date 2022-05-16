@@ -45,6 +45,13 @@ case "${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}" in
   *)                          log-init "invalid value for systemLog.timeStampFormat: ${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}";;
 esac
 
+# net.port
+if is_enabled "${MONGO_MAINTENANCE}"; then
+  set_mongo_param "net.port" "${MONGO_MAINTENANCE_PORT}"
+else
+  set_mongo_param "net.port" "${MONGO_PORT}"
+fi
+
 # net.unixDomainSocket
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
   set_mongo_param "net.unixDomainSocket.enabled" true
