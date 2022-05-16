@@ -16,7 +16,7 @@ fi
 set_mongo_param "systemLog.verbosity" "${MONGO_SYSTEMLOG_VERBOSITY}"
 
 # Set log path
-set_mongo_param "systemLog.path" "${MONGO_LOG_FILE}"
+set_mongo_param "systemLog.path" "${MONGO_SYSTEMLOG_PATH}"
 
 
 # net.unixDomainSocket
