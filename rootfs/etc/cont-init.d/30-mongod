@@ -52,6 +52,9 @@ else
   set_mongo_param "net.port" "${MONGO_PORT}"
 fi
 
+# net.maxIncomingConnections
+set_mongo_param "net.maxIncomingConnections" "${MONGO_MAX_INCOMING_CONNS}"
+
 # net.unixDomainSocket
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
   set_mongo_param "net.unixDomainSocket.enabled" true
