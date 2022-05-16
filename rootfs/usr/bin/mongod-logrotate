@@ -5,6 +5,12 @@ set -e
 # shellcheck source=../../etc/cont-mongo.d/functions
 source /etc/cont-mongo.d/functions
 
+echo "$(basename "${0}")::start @ $(date)"
 kill -SIGUSR1 "$(get_service_pid mongod)"
+
+echo "$(basename "${0}")::cleanup"
+find /config/mongo/logs -mtime +7 -name 'mongod.log*' -print -delete
+
+echo "$(basename "${0}")::done"
 
 # EOF
