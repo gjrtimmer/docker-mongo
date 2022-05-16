@@ -9,3 +9,12 @@ if [ ! -f "${MONGO_CONFIG}" ]; then
   log-init "loading default configuration"
   s6-setuidgid abc cp -r /defaults/mongo/mongod.conf "${MONGO_CONFIG}"
 fi
+
+# directoryPerDB
+if is_enabled "${MONGO_DIRECTORY_PER_DB}"; then
+  set_mongo_param "storage.directoryPerDB" true
+else
+  set_mongo_param "storage.directoryPerDB" false
+fi
+
+# EOF
