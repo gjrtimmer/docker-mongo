@@ -18,6 +18,12 @@ set_mongo_param "systemLog.verbosity" "${MONGO_SYSTEMLOG_VERBOSITY}"
 # systemLog.path
 set_mongo_param "systemLog.path" "${MONGO_SYSTEMLOG_PATH}"
 
+# systemLog.logAppend
+if is_enabled "${MONGO_SYSTEMLOG_LOGAPPEND}"; then
+  set_mongo_param "systemLog.logAppend" true
+else
+  set_mongo_param "systemLog.logAppend" false
+fi
 
 # net.unixDomainSocket
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
