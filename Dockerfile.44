@@ -102,7 +102,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 EXPOSE 27017/tcp
 
 WORKDIR ${HOME}
-VOLUME [ "${HOME}", "${HOME}/mongo/archive", "${HOME}/mongo/db", "${HOME}/mongo/configdb" ]
+VOLUME [ "${HOME}", "${HOME}/mongo/archive" ]
 
 COPY rootfs/ /
 
