@@ -30,7 +30,7 @@ fi
 # systemLog.logRotate
 case "${MONGO_SYSTEMLOG_LOGROTATE}" in
   rename|reopen)  set_mongo_param "systemLog.logRotate" "${MONGO_SYSTEMLOG_LOGROTATE}";;
-  *) log-init     "invalid value for systemLog.logRotate: ${MONGO_SYSTEMLOG_LOGROTATE}";;
+  *)              log-init "invalid value for systemLog.logRotate: ${MONGO_SYSTEMLOG_LOGROTATE}";;
 esac
 
 # net.unixDomainSocket
