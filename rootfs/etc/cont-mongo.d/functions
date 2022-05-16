@@ -22,6 +22,29 @@ is_service_running() {
 	return 1
 }
 
+## Check if enabled
+# $1 parameter to Check
+#
+# usage: if is_enabled "${VAR}"; then
+is_enabled() {
+    local BOOL="${1}"
+
+    # shellcheck disable=2086
+    if (( BOOL == 1 )) || [ "${BOOL}" == true ] || [ "${BOOL,,}" = "true" ] || [ "${BOOL,,}" = "enable" ] || [ "${BOOL,,}" = "enabled" ] || [ "${BOOL,,}" = "on" ]; then
+        return 0
+    fi
+
+    return 1
+}
+
+set_mongo_param() {
+	local PARAM="${1}"
+	local VALUE="${2}"
+
+	log-init "setting mongo param ${PARAM} = ${VALUE}"
+	yq -i ".${PARAM} = ${VALUE}" "${MONGO_CONFIG}"
+}
+
 ## Set container timezone
 # $1 Timezone
 container_set_timezone() {
@@ -38,7 +61,10 @@ cron_configure_dirs() {
 		mkdir -p "${CRON_LOG_DIR}"
 	fi
 
+	log-init "setting permissions::${CRON_DATA_DIR}"
 	chown -R abc:abc "${CRON_DATA_DIR}"
+
+	log-init "setting permissions::${CRON_LOG_DIR}"
 	chown -R abc:abc "${CRON_LOG_DIR}"
 }
 
@@ -76,6 +102,18 @@ mongo_configure_dirs() {
 	if [ ! -d "${MONGO_ARCHIVE_DIR}" ]; then
 		mkdir -p "${MONGO_ARCHIVE_DIR}"
 	fi
+
+	if [ ! -d "${MONGO_LOG_DIR}" ]; then
+		mkdir -p "${MONGO_LOG_DIR}"
+	fi
+
+	log-init "setting permissions::${MONGO_HOME}"
+	chown -R abc:abc "${MONGO_HOME}"
+}
+
+# _js_escape 'some "string" value'
+_js_escape() {
+	jq --null-input --arg 'str' "$1" '$str'
 }
 
 # EOF
