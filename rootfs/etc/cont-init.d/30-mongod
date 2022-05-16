@@ -39,6 +39,11 @@ case "${MONGO_SYSTEMLOG_DESTINATION}" in
   *)            log-init "invalid value for systemLog.destination: ${MONGO_SYSTEMLOG_DESTINATION}";;
 esac
 
+# systemLog.timeStampFormat
+case "${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}" in
+  iso8601-local|iso8601-utc)  set_mongo_param "systemLog.timeStampFormat" "${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}";;
+  *)                          log-init "invalid value for systemLog.timeStampFormat: ${MONGO_SYSTEMLOG_TIMESTAMP_FORMAT}";;
+esac
 
 # net.unixDomainSocket
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
