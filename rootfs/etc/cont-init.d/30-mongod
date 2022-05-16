@@ -14,7 +14,7 @@ fi
 # systemLog.verbosity
 case "${MONGO_SYSTEMLOG_VERBOSITY}" in
   0|1|2|3|4|5)  set_mongo_param "systemLog.verbosity" "${MONGO_SYSTEMLOG_VERBOSITY}";;
-  *)            log-init "invalid value for systemLog.verbosity: ${MONGO_SYSTEMLOG_VERBOSITY}" ;;
+  *)            log-init "invalid value for systemLog.verbosity: ${MONGO_SYSTEMLOG_VERBOSITY}";;
 esac
 
 # systemLog.path
