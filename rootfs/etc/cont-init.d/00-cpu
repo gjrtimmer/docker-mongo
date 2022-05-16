@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+
+if ! grep -qE '^flags.* avx( .*|$)' /proc/cpuinfo; then
+  {
+    echo
+    echo 'WARNING: MongoDB 5.0+ requires a CPU with AVX support, and your current system does not appear to have that!'
+    echo '  see https://jira.mongodb.org/browse/SERVER-54407'
+    echo '  see also https://www.mongodb.com/community/forums/t/mongodb-5-0-cpu-intel-g4650-compatibility/116610/2'
+    echo '  see also https://github.com/docker-library/mongo/issues/485#issuecomment-891991814'
+    echo
+  } >&2
+fi
+
+# EOF
