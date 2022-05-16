@@ -33,6 +33,13 @@ case "${MONGO_SYSTEMLOG_LOGROTATE}" in
   *)              log-init "invalid value for systemLog.logRotate: ${MONGO_SYSTEMLOG_LOGROTATE}";;
 esac
 
+# systemLog.destination
+case "${MONGO_SYSTEMLOG_DESTINATION}" in
+  file|syslog)  set_mongo_param "systemLog.destination" "${MONGO_SYSTEMLOG_DESTINATION}";;
+  *)            log-init "invalid value for systemLog.destination: ${MONGO_SYSTEMLOG_DESTINATION}";;
+esac
+
+
 # net.unixDomainSocket
 if is_enabled "${MONGO_SOCKET_ENABLED}"; then
   set_mongo_param "net.unixDomainSocket.enabled" true
